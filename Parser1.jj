@@ -1,0 +1,188 @@
+PARSER_BEGIN(Parser1)
+public class Parser1 {
+    public static void main(String args[]) throws ParseException, TokenMgrError {
+        Parser1 parser = new Parser1(System.in);
+        parser.init();
+    }
+
+}
+PARSER_END(Parser1)
+
+
+
+SKIP : // TOKENS IGNORADOS
+{
+ " "
+| "\r" 
+| "\t" 
+| "\n"
+| <COMENTARIO: "//" (<COM>)*>
+| <COMENTARIOS: "/" ("\n" | "\r" | <COM>) "*/" >
+| <#COM: ( ~["\"","\\","\n","\r"] | "\\" ( ["n","t","b","r","f","\\","\'","\""] | ( ["\n","\r"] | "\r\n")))*>
+
+}
+TOKEN : //PALAVRAS RESERVADAS
+{
+ 
+<BEGIN: "begin">{
+                                     System.out.println("Palavra Reservada: "+image);
+                                     }
+|
+< #DIGIT: ["0"-"9"] >
+| 
+< ID: ["a"-"z"] (["a"-"z"]|<DIGIT>)* >{
+                                     System.out.println("Identificador: "+image);
+                                     }
+|
+<PUBLIC: "Public">{System.out.println("public: "+image);}
+|
+<STATIC: "Static">{System.out.println("static: "+image);}
+|
+<VOID: "Void">{System.out.println("void: "+image);}
+|
+<MAIN: "Main">{System.out.println("main: "+image);}
+|
+<STRING: "String">{System.out.println("Tipo String: "+image);}
+|
+<CLASS: "Class">{System.out.println("Class: "+image);}
+|
+<RETURN: "Return">{System.out.println("Retorno: "+image);}
+|
+<IF:"If">{System.out.println("If: "+image);}
+|
+<ELSE: "Else">{System.out.println("Else: "+image);}
+|
+<WHILE: "While">{System.out.println("While: "+image);}
+|
+<SYSTEM: "System">{System.out.println("System: "+image);}
+|
+<OUT: "Out">{System.out.println("Out: "+image);}
+|
+<PRINTLN: "Println">{System.out.println("Println: "+image);}
+|
+/*símbolos de marcação */
+<NEW: "New">{System.out.println("New: "+image);}
+|
+<THIS: "This">{System.out.println("This: "+image);}
+|
+<LENGTH: "Length">{System.out.println("Length: "+image);}
+|
+<AP: "(">{
+                                     System.out.println("Abre parenteses: "+image);
+                                     }
+|
+<FP: ")">{
+                                     System.out.println("Fecha parenteses: "+image);
+                                     }
+|
+<ACO: "[">{
+                                      System.out.println("Abre colchetes: "+image);
+  }
+|
+<FCO: "]">{
+                                      System.out.println("Fecha colchetes: "+image);
+}
+|
+<ACH: "{">{
+                                     System.out.println("Abre chaves: "+image);
+                                     }
+|
+<FCH: "}">{
+                                     System.out.println("Fecha chaves: "+image);
+                                     }
+|
+<ASGN: "=">{
+                                    System.out.println("atribuicao: "+image);
+                                    }
+|
+<V: ",">{
+                                    System.out.println("virgula: "+image);
+                                    }
+|
+<PV: ";">{
+                                     System.out.println("ponto e virgula: "+image);
+                                     }
+|
+/*declarações de tipos */
+<INT: "INT">{
+                                     System.out.println("Tipo inteiro: "+image);
+                                     }
+|
+<BOOLEAN: "BOOLEAN">{
+                                     System.out.println("Tipo booleano: "+image);
+}
+|
+<TRUE: "True">{System.out.println("true: "+image);}
+|
+<FALSE: "False">{System.out.println("false: "+image);}
+|
+<INTEGER_LITERAL: (["0"-"9"])+>{
+                                     System.out.println("inteiro: "+image);
+}
+|
+<SOMA: "+">{
+                                      System.out.println("soma: "+image);
+                                      }
+|
+<SUBT: "-">{
+                                      System.out.println("subtracao: "+image);
+                                      }
+|
+<MQ: "<">{System.out.println("Menor que: "+image);}
+|
+<MULT: "*">{System.out.println("multiplicacao: "+image);}
+|
+<PONTO: ".">{System.out.println("Ponto: "+image);}
+|
+<NEG: "!">{System.out.println("Negacao: "+image);}
+|
+<AND: "&&">{System.out.println("'E' logico: "+image);}
+}
+
+SPECIAL_TOKEN : {
+ 
+ <INVALIDO_LEXICO:
+
+ (~["(",")","{","}", "[", "]", " ","\t","\n","\r","\f", ";", ",", "=", "+", "!", "-", "*", "."])+>
+
+
+}
+
+
+
+
+void init():{}{programa()}
+void programa():{}
+{ MainClass() (ClassDecl())* }
+void MainClass():{}{<CLASS> <ID> <ACH> <PUBLIC> <STATIC> <VOID> <MAIN> <AP> <STRING> <ACO> <FCO> <ID> <FP> <ACH> Statement() <FCH><FCH>}
+void ClassDecl():{}{<CLASS> <ID> <ACH> (VarDecl())* <FCH>}
+void VarDecl():{}{Type() <ID>}
+void MethodDecl():{}{<PUBLIC> Type() <ID> <AP> FormalList() <FP> <ACH> (VarDecl())* (Statement())* <RETURN> Exp() <PV> <FCH>}
+void FormalList():{}{ (Type() <ID> (FormalRest())* )? }
+void FormalRest():{}{<V> Type() <ID>}
+void Type():{}{<INT>|<BOOLEAN>|<ID>|<INT> <ACO> <FCO>}
+void Statement():{}
+{<ACH> (Statement())* <FCH>
+|<IF> <AP> Exp() <FP> Statement() <ELSE> Statement()
+|<ID> <ASGN> Exp() <PV>
+|<ID> <ACO> Exp() <FCO> <ASGN> Exp() <PV>
+|<SYSTEM><PONTO><OUT><PONTO><PRINTLN> <AP> Exp() <FP> <PV>
+|<WHILE> <AP> Exp() <FP> Statement()
+}
+
+void Exp():{}
+{<ID>
+|<TRUE>
+|<FALSE>
+|<INTEGER_LITERAL>
+|<THIS>
+|<NEW> <INT> <ACO> Exp() <FCO>
+|<NEW> <ID> <AP><FP>
+|<AP> Exp() <FP>
+|<NEG> Exp()
+}
+
+
+void ExpList():{}{ (Exp() (ExpRest())* )? }
+void ExpRest():{}{<V> Exp()}
+void op():{}{<SOMA> | <SUBT> | <MULT> | <MQ> | <AND>}
